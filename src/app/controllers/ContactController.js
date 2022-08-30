@@ -21,7 +21,7 @@ class ContactController {
 
   async store(request, response){
     const{
-      name, email, phone, category
+      name, email, phone, category_id
     } = request.body;
 
     const contactExists = await ContactRepository.findByEmail(email);
@@ -35,7 +35,7 @@ class ContactController {
     }
 
     const contact = await ContactRepository.create({
-      name, email, phone, category
+      name, email, phone, category_id
     });
 
     response.json(contact);
@@ -44,7 +44,7 @@ class ContactController {
     const { id } = request.params;
 
     const {
-      name, email, phone, category
+      name, email, phone, category_id
     } = request.body;
 
     if(!name){

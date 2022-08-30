@@ -1,26 +1,29 @@
 const { v4 } = require('uuid');
 
+const db  = require('../../database')
+
 let contacts = [
   {
     id: v4(),
     name: 'Mateus',
     email: 'mateus@email.com',
     phone: '123123123',
-    category: v4(),
+    category_id: v4(),
   },
   {
     id: v4(),
     name: 'João',
     email: 'joao@email.com',
     phone: '123123123',
-    category: v4(),
+    category_id: v4(),
   },
 ];
 class ContactRepository {
-  findAlll() {
-    return new Promise((resolve) => resolve(contacts));
+  async findAlll() {
+    const row= await db.query(`SELECT * FROM contacts`);
+    return row;
   }
-  findById(id){
+  async findById(id){
 
     return new Promise((resolve) => resolve(
       contacts.find((contact) => contact.id == id),
@@ -41,24 +44,18 @@ class ContactRepository {
     });
   }
 
-  create({
-    name, email, phone, category,
+  async create({
+    name, email, phone, category_id,
   }){
-    return new Promise((resolve) =>{
-      const newContact = {
-        id:v4(),
-        name,
-        email,
-        phone,
-        category
-      };
-      contacts.push(newContact);
-      resolve(newContact);
-    });
+   const [row] = await db.query(`INSERT INTO contacts(name, email, phone, category_id)
+   VALUES($1, $2, $3, $4)
+   RETURNING *
+   `,[name, email, phone, category_id]);
+   return row;
   }
 
   update({
-    name, email, phone, category,
+    name, email, phone, category_id,
   }){
     return new Promise((resolve) =>{
       const updateContact = {
@@ -66,7 +63,7 @@ class ContactRepository {
         name,
         email,
         phone,
-        category
+        category_id
       };
       contacts =contacts.map((contact)=> (
         contact.id == id ? updateContact : contact
